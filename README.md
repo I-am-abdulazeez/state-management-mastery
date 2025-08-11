@@ -2,7 +2,7 @@
 
 *Master state management in 8 core principles*
 
-[![GitHub stars](https://img.shields.io/github/stars/username/state-management-mastery?style=social)](https://github.com/I-am-abdulazeez/state-management-mastery)
+[![GitHub stars](https://img.shields.io/github/stars/I-am-abdulazeez/state-management-mastery?style=social)](https://github.com/I-am-abdulazeez/state-management-mastery)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## 📖 About
