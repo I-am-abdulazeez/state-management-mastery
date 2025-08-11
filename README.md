@@ -51,7 +51,7 @@ Each has different patterns and tools.
 - **Vue**: Pinia + plugins, Effector
 
 **🌐 Framework-agnostic solutions:**
-- **Stunk**: Fine-grained reactivity, works with all frameworks ()
+- **Stunk**: Fine-grained reactivity, works with all frameworks
 - **Effector**: Works with any UI or server framework. Tested with React, Solid, Vue. (https://github.com/effector/effector)
 
 **💡 Pro tip:** Start simple and migrate up as complexity grows. Don't over-engineer from day one.
@@ -75,56 +75,84 @@ When you follow these principles, your apps will have:
 
 ## 🔧 Quick Examples
 
-### React with Fine-Grained State (Stunk)
+### Fine-Grained State (Stunk)
 ```javascript
 import { chunk } from "stunk";
-import { useChunk } from "stunk/react";
 
 const count = chunk(0);
 
-const Counter = () => {
-  const [value, set, reset] = useChunk(count);
+// Get current value
+console.log(count.get()); // 0
 
-  return (
-    <div>
-      <p>Count: {value}</p>
-      <button onClick={() => set((prev) => prev + 1)}>Increment</button>
-      <button onClick={() => reset()}>Reset</button>
-    </div>
-  );
-};
+// Update value
+count.set(5);
+count.set((prev) => prev + 1); // 6
+
+// Subscribe to changes
+count.subscribe((value) => {
+  console.log('Count changed:', value);
+});
+
+// Reset to initial value
+count.reset(); // Back to 0
 ```
 
+### Computed Values
 ```javascript
-import { chunk } from "stunk";
-import { useDerive } from "stunk/react";
+import { chunk, computed } from "stunk";
 
-const count = chunk(0);
+const price = chunk(100);
+const quantity = chunk(2);
 
-const DoubledCount = () => {
-  const double = useDerive(count, (value) => value * 2);
+// Auto-updates when price or quantity changes
+const total = computed(
+  [price, quantity],
+  (priceValue, quantityValue) => priceValue * quantityValue
+);
 
-  return <p>Double: {double}</p>;
-};
+total.subscribe((value) => {
+  console.log('Total:', value); // 200
+});
+
+quantity.set(3); // Triggers: "Total: 300"
 ```
 
 ### Data Flow Mapping
 ```javascript
 import { chunk, select } from "stunk";
-// ❌ Bad: Duplicated state
-const [userProfile, setUserProfile] = useState()
-const [userName, setUserName] = useState()
-const [userEmail, setUserEmail] = useState()
 
-// ✅ Good: Single source of truth - Outside React component
+// ❌ Bad: Duplicated state
+let userProfile = { name: 'John', email: 'john@example.com' };
+let userName = 'John';
+let userEmail = 'john@example.com';
+
+// Synchronization nightmare! Update one, forget the others
+
+// ✅ Good: Single source of truth
 const userState = chunk({
   name: 'John',
   email: 'john@example.com',
   avatar: '/avatar.jpg'
-})
+});
 
-const userName = select(userState, (state) => state.name)
-const userEmail = select(userState, (state) => state.email)
+const userName = select(userState, (state) => state.name);
+const userEmail = select(userState, (state) => state.email);
+
+// Subscribe to changes
+userName.subscribe((name) => {
+  console.log('Name updated:', name);
+});
+
+userEmail.subscribe((email) => {
+  console.log('Email updated:', email);
+});
+
+// Update once, all derived values automatically update
+userState.set({ 
+  name: 'Jane', 
+  email: 'jane@example.com', 
+  avatar: '/new-avatar.jpg' 
+});
 ```
 
 ## 📚 Related Tools
@@ -132,8 +160,7 @@ const userEmail = select(userState, (state) => state.email)
 - **[Stunk](https://github.com/I-am-abdulazeez/stunk)** - Framework-agnostic, fine-grained state management that embodies these principles
 - **[Zustand](https://github.com/pmndrs/zustand)** - Lightweight React state management
 - **[Pinia](https://github.com/vuejs/pinia)** - Vue's intuitive state management
-- **[Effector](https://github.com/effector/effector)** - Meet the new standard for modern TypeScript development.
-Type safe, reactive, framework agnostic.
+- **[Effector](https://github.com/effector/effector)** - Meet the new standard for modern TypeScript development. Type safe, reactive, framework agnostic.
 
 ## 🤝 Contributing
 
