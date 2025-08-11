@@ -1,4 +1,4 @@
-# 🧠 State Management Mastery
+# State Management Mastery
 
 *Master state management in 8 core principles*
 
@@ -7,29 +7,29 @@
 
 ## 📖 About
 
-State management is the backbone of modern apps. Get it wrong, and you'll spend months debugging "ghost bugs." Get it right, and your app becomes predictable, scalable, and maintainable.
+State management is the backbone of modern apps. Get it wrong, and you'll spend months debugging "ghost bugs." Get it right, and your app becomes **predictable**, **scalable**, and **maintainable**.
 
 This repository breaks down state management mastery into **8 essential principles** that will transform how you build applications.
 
 ## 🎯 The 8 Principles
 
-### 1. 🧠 **State Management is Your App's Backbone**
+### 1. **State Management is Your App's Backbone**
 Get it wrong, and you'll spend months debugging "ghost bugs" where data appears and disappears mysteriously. Get it right, and your app becomes predictable, scalable, and maintainable.
 
-### 2. 💡 **Single Source of Truth**
+### 2. **Single Source of Truth**
 Every piece of data should have ONE authoritative source. When you duplicate state across components, you're asking for synchronization nightmares. One source, multiple subscribers.
 
-### 3. 🔄 **Think in Data Flow, Not Components**
+### 3. **Think in Data Flow, Not Components**
 Map out how data moves through your app before writing code:
 - Where does data originate?
 - Who needs to read it? 
 - Who can modify it?
 - When should updates trigger re-renders?
 
-### 4. ⚡ **Granular Beats Global**
-Instead of one massive global state object, break it into focused, independent chunks. User profile, shopping cart, and app settings shouldn't live in the same state bucket. Fine-grained reactivity = better performance.
+### 4. **Granular Beats Global**
+Instead of one massive global state object, break it into focused, independent chunks. User profile, shopping cart, and app settings shouldn't live in the same state bucket. **Fine-grained reactivity = better performance**.
 
-### 5. 🎯 **Separate Concerns Clearly**
+### 5. **Separate Concerns Clearly**
 - **Local state**: Component-specific data (form inputs, toggles)
 - **Shared state**: Cross-component data (user auth, theme)
 - **Server state**: API responses, cache management
@@ -37,21 +37,35 @@ Instead of one massive global state object, break it into focused, independent c
 Each has different patterns and tools.
 
 ### 6. 🚀 **Choose Tools That Match Your Complexity**
-- **Simple apps**: React useState, Vue ref()
-- **Medium complexity**: Context API, Pinia
-- **Complex apps**: Redux, Zustand, MobX
-- **Framework-agnostic**: Libraries like Stunk, Valtio
 
-Don't over-engineer.
+**🟢 Simple apps (Local state, few components):**
+- **React**: `useState`, `useReducer`
+- **Vue**: `ref()`, `reactive()`
 
-### 7. 🐛 **Debug with Time-Travel**
+**🟡 Medium complexity (Shared state, multiple features):**
+- **React**: Stunk, Zustand, Context API, Effector
+- **Vue**: Pinia, Effector
+
+**🔴 Complex apps (Enterprise scale, heavy async):**
+- **React**: Stunk, Zustand, RTK, Jotai, Effector
+- **Vue**: Pinia + plugins, Effector
+
+**🌐 Framework-agnostic solutions:**
+- **Stunk**: Fine-grained reactivity, works with all frameworks ()
+- **Effector**: Works with any UI or server framework. Tested with React, Solid, Vue. (https://github.com/effector/effector)
+
+**💡 Pro tip:** Start simple and migrate up as complexity grows. Don't over-engineer from day one.
+
+### 7. **Debug with Time-Travel**
 Good state management should let you:
 - See all state changes over time
 - Replay actions to reproduce bugs
 - Rollback to previous states
 - Track which actions caused which updates
 
-### 8. 🎉 **Master These Patterns**
+**💡Pro Tip: Stunk has inbuilt Time-Travel (`withHistory()`)**
+
+### 8. **Master These Patterns**
 When you follow these principles, your apps will have:
 - Predictable updates
 - Easier debugging
@@ -61,65 +75,65 @@ When you follow these principles, your apps will have:
 
 ## 🔧 Quick Examples
 
-### React with Fine-Grained State
+### React with Fine-Grained State (Stunk)
 ```javascript
-import { createState, createComputed } from 'stunk'
+import { chunk } from "stunk";
+import { useChunk } from "stunk/react";
 
-const count = createState(0)
-const doubled = createComputed(() => count.value * 2)
+const count = chunk(0);
 
-function Counter() {
+const Counter = () => {
+  const [value, set, reset] = useChunk(count);
+
   return (
     <div>
-      <p>Count: {count.value}</p>
-      <p>Doubled: {doubled.value}</p>
-      <button onClick={() => count.set(count.value + 1)}>
-        Increment
-      </button>
+      <p>Count: {value}</p>
+      <button onClick={() => set((prev) => prev + 1)}>Increment</button>
+      <button onClick={() => reset()}>Reset</button>
     </div>
-  )
-}
+  );
+};
+```
+
+```javascript
+import { chunk } from "stunk";
+import { useDerive } from "stunk/react";
+
+const count = chunk(0);
+
+const DoubledCount = () => {
+  const double = useDerive(count, (value) => value * 2);
+
+  return <p>Double: {double}</p>;
+};
 ```
 
 ### Data Flow Mapping
 ```javascript
+import { chunk, select } from "stunk";
 // ❌ Bad: Duplicated state
 const [userProfile, setUserProfile] = useState()
 const [userName, setUserName] = useState()
 const [userEmail, setUserEmail] = useState()
 
-// ✅ Good: Single source of truth
-const userState = createState({
+// ✅ Good: Single source of truth - Outside React component
+const userState = chunk({
   name: 'John',
   email: 'john@example.com',
   avatar: '/avatar.jpg'
 })
 
-const userName = createComputed(() => userState.value.name)
-const userEmail = createComputed(() => userState.value.email)
-```
-
-## 🛠️ Framework Examples
-
-- **[React Examples](./examples/react)** - useState, Context, Stunk integration
-- **[Vue Examples](./examples/vue)** - ref(), Pinia, reactive patterns
-- **[Vanilla JS](./examples/vanilla)** - Framework-agnostic approaches
-- **[Angular Examples](./examples/angular)** - Services, state management patterns
-
-## 🚀 Quick Start
-
-```bash
-git clone https://github.com/username/state-management-mastery.git
-cd state-management-mastery/examples
-npm install && npm run dev
+const userName = select(userState, (state) => state.name)
+const userEmail = select(userState, (state) => state.email)
 ```
 
 ## 📚 Related Tools
 
 - **[Stunk](https://github.com/I-am-abdulazeez/stunk)** - Framework-agnostic, fine-grained state management that embodies these principles
-- **Redux Toolkit** - Modern Redux implementation
-- **Zustand** - Lightweight React state management
-- **Pinia** - Vue's intuitive state management
+- **[Zustand](https://github.com/pmndrs/zustand)** - Lightweight React state management
+- **[Pinia](https://github.com/vuejs/pinia)** - Vue's intuitive state management
+- **[Effector](https://github.com/effector/effector)** - Meet the new standard for modern TypeScript development.
+Type safe, reactive, framework agnostic.
 
 ## 🤝 Contributing
 
